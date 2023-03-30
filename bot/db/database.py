@@ -33,6 +33,11 @@ class DataBase:
                     f'INSERT INTO users(id, username, flname) VALUES ({kwargs["user_id"]}, "{kwargs["username"]}", "{kwargs["flname"]}")')
                 self.conn.commit()
 
+    # Обновить id модели у user-а
+    def update_model_user(self, **kwargs):
+        self.cursor.execute(f'UPDATE users SET model_id_selected = {kwargs["model_id"]} WHERE id = {kwargs["user_id"]}')
+        self.conn.commit()
+
 
 # Экземпляр класса DataBase
 db = DataBase()
