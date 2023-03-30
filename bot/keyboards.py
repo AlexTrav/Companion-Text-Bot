@@ -4,6 +4,21 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from bot.db.database import db
 
 
+# Отправить удаление нижней-клавиатуры
+def reply_keyboard_remove():
+    answer = 'Успешно'
+    rrm = ReplyKeyboardRemove()
+    return answer, rrm
+
+
+# Отправить имя модели нейросети
+def get_model_name(user_id):
+    selected_model_id = db.get_data(table='users', where=1, op1='id', op2=user_id)[0][3]
+    model_name = db.get_data(table='models', where=1, op1='id', op2=selected_model_id)[0][1]
+    return model_name
+
+
+# Отправить клавиатуру команды start
 def get_start_kb():
     answer = 'Добро пожаловать в Companion Text Bot!'
     start_kb = InlineKeyboardMarkup(row_width=1, inline_keyboard=[
@@ -15,12 +30,7 @@ def get_start_kb():
     return answer, start_kb
 
 
-def reply_keyboard_remove():
-    answer = 'Успешно'
-    rrm = ReplyKeyboardRemove()
-    return answer, rrm
-
-
+# Отправить клавиатуру режима беседы
 def get_talks_kb(user_id):
     selected_model_id = db.get_data(table='users', where=1, op1='id', op2=user_id)[0][3]
     model = db.get_data(table='models', where=1, op1='id', op2=selected_model_id)[0]
@@ -29,10 +39,6 @@ def get_talks_kb(user_id):
     return answer, talks_kb
 
 
-def get_model_name(user_id):
-    selected_model_id = db.get_data(table='users', where=1, op1='id', op2=user_id)[0][3]
-    model_name = db.get_data(table='models', where=1, op1='id', op2=selected_model_id)[0][1]
-    return model_name
 
 
 

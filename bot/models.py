@@ -2,9 +2,11 @@ import openai
 from os import getenv
 
 
+# Получить api_key
 openai.api_key = getenv("OPENAI_API_KEY")
 
 
+# Отрпавить ответ нейросети
 def get_answer(model_name, text):
     if model_name == 'Chat':
         return chat(text)
@@ -14,6 +16,7 @@ def get_answer(model_name, text):
         return explain_code(text)
 
 
+# Модель Chat
 def chat(text):
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -28,6 +31,7 @@ def chat(text):
     return response['choices'][0]['text']
 
 
+# Модель Friend chat
 def friend_chat(text):
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -42,6 +46,7 @@ def friend_chat(text):
     return response['choices'][0]['text']
 
 
+# Модель Explain code
 def explain_code(text):
     response = openai.Completion.create(
       model="text-davinci-003",

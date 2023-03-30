@@ -6,6 +6,7 @@ from bot.models import get_answer
 from bot.states import UserStatesGroup
 
 
+# Обработчик режима диалога и кнопки ←. Принимает запрос, отправляет ответ
 @dp.message_handler(content_types=['text'], state=UserStatesGroup.talks)
 async def send_answer(message: types.Message) -> None:
     if message.text == '←':

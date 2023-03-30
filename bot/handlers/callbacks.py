@@ -5,6 +5,7 @@ from bot.states import UserStatesGroup
 from bot.keyboards import *
 
 
+# Обработчик кнопки "Начать разговор"
 @dp.callback_query_handler(text='talks', state=UserStatesGroup.start)
 async def open_talks(callback: types.CallbackQuery):
     await UserStatesGroup.talks.set()

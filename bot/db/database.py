@@ -1,12 +1,15 @@
 import sqlite3 as sq
 
 
+# Класс базы данных
 class DataBase:
 
+    # Инициализатор conn и cursor
     def __init__(self):
         self.conn = sq.connect('bot/db/database.db')
         self.cursor = self.conn.cursor()
 
+    # Получить данные из таблицы
     def get_data(self, **kwargs):
         if 'where' in kwargs:
             self.cursor.execute(f'SELECT * FROM {kwargs["table"]} WHERE {kwargs["op1"]} = "{kwargs["op2"]}"')
@@ -14,6 +17,7 @@ class DataBase:
             self.cursor.execute(f"SELECT * FROM {kwargs['table']}")
         return self.cursor.fetchall()
 
+    # Проверка наличия пользователя в базе данных
     def checking_user(self, **kwargs):
         self.cursor.execute('SELECT * FROM users')
         users = self.cursor.fetchall()
@@ -30,4 +34,5 @@ class DataBase:
                 self.conn.commit()
 
 
+# Экземпляр класса DataBase
 db = DataBase()
