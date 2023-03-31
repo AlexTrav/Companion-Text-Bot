@@ -4,9 +4,10 @@ from bot.loader import dp
 from bot.keyboards import *
 from bot.models import get_answer
 from bot.states import UserStatesGroup
+from bot.db.database import db
 
 
-# Обработчик режима диалога и кнопки ←. Принимает запрос, отправляет ответ
+# Обработчик режима диалога и кнопки ←. Принимает запрос, отправляет ответ - Меню диалога с 🤖
 @dp.message_handler(content_types=['text'], state=UserStatesGroup.talks)
 async def send_answer(message: types.Message) -> None:
     if message.text == '←':
@@ -18,4 +19,7 @@ async def send_answer(message: types.Message) -> None:
         await message.answer(text=ans1,
                              reply_markup=kb1)
     else:
-        await message.answer(get_answer(get_model_name(message.from_user.id), message.text))
+        answer = get_answer(get_model_name_kb(message.from_user.id), message.text)
+        if answer != '':
+            db.insert_log(user_id=message.from_user.id, model_id=db.get_model_id(user_id=message.from_user.id), question=message.text, answer=answer.lstrip())
+            await message.answer(answer)

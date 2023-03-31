@@ -38,6 +38,16 @@ class DataBase:
         self.cursor.execute(f'UPDATE users SET model_id_selected = {kwargs["model_id"]} WHERE id = {kwargs["user_id"]}')
         self.conn.commit()
 
+    # Вставить запись в таблицу логи
+    def insert_log(self, **kwargs):
+        self.cursor.execute(f'INSERT INTO logs(user_id, model_id, question, answer) VALUES ({kwargs["user_id"]}, {kwargs["model_id"]}, "{kwargs["question"]}", "{kwargs["answer"]}")')
+        self.conn.commit()
+
+    def get_model_id(self, **kwargs):
+        self.cursor.execute(f'SELECT model_id_selected FROM users WHERE id = {kwargs["user_id"]}')
+        model_id = self.cursor.fetchall()[0][0]
+        return model_id
+
 
 # Экземпляр класса DataBase
 db = DataBase()

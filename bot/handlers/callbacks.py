@@ -7,7 +7,7 @@ from bot.keyboards import *
 from bot.db.database import db
 
 
-# Обработчик кнопки "Начать разговор"
+# Обработчик кнопки "Начать разговор" - Главное меню
 @dp.callback_query_handler(text='talks', state=UserStatesGroup.start)
 async def open_talks(callback: types.CallbackQuery):
     await UserStatesGroup.talks.set()
@@ -17,17 +17,17 @@ async def open_talks(callback: types.CallbackQuery):
     await callback.answer()
 
 
-# Обработчик команды "Выбрать модель"
+# Обработчик команды "Выбрать модель" - Главное меню
 @dp.callback_query_handler(text='update_model', state=UserStatesGroup.start)
 async def open_all_model(callback: types.CallbackQuery):
     await UserStatesGroup.update_model.set()
-    ans, kb = get_all_model()
-    await callback.message.answer(text=ans,
-                                  reply_markup=kb)
+    ans, kb = get_all_model_kb()
+    await callback.message.edit_text(text=ans,
+                                     reply_markup=kb)
     await callback.answer()
 
 
-# Обработчик выбора модели и возвращения в главное меню
+# Обработчик выбора модели и возвращения в главное меню - Меню выбора модели
 @dp.callback_query_handler(CallbackData('all_model', 'id', 'action').filter(), state=UserStatesGroup.update_model)
 async def open_model(callback: types.CallbackQuery, callback_data: dict):
     if callback_data['action'] == 'back':
@@ -36,19 +36,19 @@ async def open_model(callback: types.CallbackQuery, callback_data: dict):
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
     else:
-        ans, kb = get_model(model_id=callback_data['id'])
+        ans, kb = get_model_kb(model_id=callback_data['id'])
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
     await callback.answer()
 
 
-# Обработчик установки модели или  возвращения в меню выбора модели
+# Обработчик установки модели или возвращения в меню выбора модели - Меню установки модели
 @dp.callback_query_handler(CallbackData('model', 'id', 'action').filter(), state=UserStatesGroup.update_model)
 async def update_model(callback: types.CallbackQuery, callback_data: dict):
     if callback_data['action'] == 'back':
-        ans, kb = get_all_model()
-        await callback.message.answer(text=ans,
-                                      reply_markup=kb)
+        ans, kb = get_all_model_kb()
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
     else:
         db.update_model_user(user_id=callback.from_user.id, model_id=callback_data['id'])
         await UserStatesGroup.start.set()
@@ -56,4 +56,39 @@ async def update_model(callback: types.CallbackQuery, callback_data: dict):
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
         await callback.answer('Модель успешно выбрана!')
+    await callback.answer()
+
+
+# Обработчик кнопки "История запросов" - Главное меню
+@dp.callback_query_handler(text='logs', state=UserStatesGroup.start)
+async def open_all_logs(callback: types.CallbackQuery):
+    await UserStatesGroup.logs.set()
+    ans, kb = get_logs_kb(callback.from_user.id)
+    await callback.message.edit_text(text=ans,
+                                     reply_markup=kb)
+    await callback.answer()
+
+
+# Обработчик последних запросов user-а и возвращения в главное меню - Меню выбора запроса
+@dp.callback_query_handler(CallbackData('logs', 'id', 'action').filter(), state=UserStatesGroup.logs)
+async def open_log(callback: types.CallbackQuery, callback_data: dict):
+    if callback_data['action'] == 'back':
+        await UserStatesGroup.start.set()
+        ans, kb = get_start_kb()
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
+    else:
+        ans, kb = get_log_kb(log_id=callback_data['id'])
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
+    await callback.answer()
+
+
+# Обработчик возвращения в историю логов пользователя - Меню лога пользователя
+@dp.callback_query_handler(CallbackData('log', 'action').filter(), state=UserStatesGroup.logs)
+async def close_log(callback: types.CallbackQuery, callback_data: dict):
+    if callback_data['action'] == 'back':
+        ans, kb = get_logs_kb(callback.from_user.id)
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
     await callback.answer()

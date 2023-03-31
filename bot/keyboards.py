@@ -12,7 +12,7 @@ def reply_keyboard_remove():
 
 
 # Отправить имя модели нейросети
-def get_model_name(user_id):
+def get_model_name_kb(user_id):
     selected_model_id = db.get_data(table='users', where=1, op1='id', op2=user_id)[0][3]
     model_name = db.get_data(table='models', where=1, op1='id', op2=selected_model_id)[0][1]
     return model_name
@@ -40,7 +40,7 @@ def get_talks_kb(user_id):
 
 
 # Отрпавить клавиатуру выбора модели
-def get_all_model():
+def get_all_model_kb():
     answer = 'Выберите модель:'
     cb = CallbackData('all_model', 'id', 'action')
     all_model_kb = InlineKeyboardMarkup(row_width=1)
@@ -51,7 +51,7 @@ def get_all_model():
 
 
 # Отправить клавиатуру модели
-def get_model(model_id):
+def get_model_kb(model_id):
     model = db.get_data(table='models', where=1, op1='id', op2=model_id)[0]
     answer = f'Модель: {model[1]}\nОписание модели: {model[2]}\nПример:\nЗапрос: {model[3]}\nПример ответа: {model[4]}'
     cb = CallbackData('model', 'id', 'action')
@@ -60,3 +60,31 @@ def get_model(model_id):
         [InlineKeyboardButton(text='←', callback_data=cb.new(id=-1, action='back'))]
     ])
     return answer, model_kb
+
+
+# Отправить клавиатуру логов пользователя
+def get_logs_kb(user_id):
+    cb = CallbackData('logs', 'id', 'action')
+    answer = f'Вот последние запросы сделанные вами:'
+    logs_kb = InlineKeyboardMarkup(row_width=1)
+    logs = db.get_data(table='logs', where=1, op1='user_id', op2=user_id)
+    if len(logs) < 50:
+        for log in logs:
+            logs_kb.add(InlineKeyboardButton(text=log[3], callback_data=cb.new(id=log[0], action='log')))
+    else:
+        for log in logs[:50]:
+            logs_kb.add(InlineKeyboardButton(text=log[3], callback_data=cb.new(id=log[0], action='log')))
+    logs_kb.add(InlineKeyboardButton(text='←', callback_data=cb.new(id=-1, action='back')))
+    return answer, logs_kb
+
+
+# Отрпавить клавиатуру лога
+def get_log_kb(log_id):
+    cb = CallbackData('log', 'action')
+    log = db.get_data(table='logs', where=1, op1='id', op2=log_id)[0]
+    model_name = db.get_data(table='models', where=1, op1='id', op2=log[2])[0][1]
+    answer = f'Детали запроса:\nЗапрос под номером: {log_id}\nИспользованная модель нейросети: {model_name}\nЗапрос: {log[3]}\nОтвет: {log[4]}'
+    log_kb = InlineKeyboardMarkup(row_width=1, inline_keyboard=[
+        [InlineKeyboardButton(text='←', callback_data=cb.new(action='back'))]
+    ])
+    return answer, log_kb
