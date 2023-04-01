@@ -43,10 +43,16 @@ class DataBase:
         self.cursor.execute(f'INSERT INTO logs(user_id, model_id, question, answer) VALUES ({kwargs["user_id"]}, {kwargs["model_id"]}, "{kwargs["question"]}", "{kwargs["answer"]}")')
         self.conn.commit()
 
+    # Получить id модели
     def get_model_id(self, **kwargs):
         self.cursor.execute(f'SELECT model_id_selected FROM users WHERE id = {kwargs["user_id"]}')
         model_id = self.cursor.fetchall()[0][0]
         return model_id
+
+    # Удалить историю запросов пользователя
+    def clear_history_logs(self, **kwargs):
+        self.cursor.execute(f'DELETE FROM logs WHERE user_id = {kwargs["user_id"]}')
+        self.conn.commit()
 
 
 # Экземпляр класса DataBase

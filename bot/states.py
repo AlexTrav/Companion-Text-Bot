@@ -7,3 +7,4 @@ class UserStatesGroup(StatesGroup):
     talks = State()
     update_model = State()
     logs = State()
+    about = State()

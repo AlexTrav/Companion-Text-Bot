@@ -69,7 +69,7 @@ async def open_all_logs(callback: types.CallbackQuery):
     await callback.answer()
 
 
-# Обработчик последних запросов user-а и возвращения в главное меню - Меню выбора запроса
+# Обработчик последних запросов user-а и возвращения в главное меню и возможности очистить историю запросов пользователя - Меню выбора запроса
 @dp.callback_query_handler(CallbackData('logs', 'id', 'action').filter(), state=UserStatesGroup.logs)
 async def open_log(callback: types.CallbackQuery, callback_data: dict):
     if callback_data['action'] == 'back':
@@ -77,8 +77,13 @@ async def open_log(callback: types.CallbackQuery, callback_data: dict):
         ans, kb = get_start_kb()
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
-    else:
+    elif callback_data['action'] == 'log':
         ans, kb = get_log_kb(log_id=callback_data['id'])
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
+    else:
+        db.clear_history_logs(user_id=callback.from_user.id)
+        ans, kb = get_logs_kb(callback.from_user.id)
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
     await callback.answer()
@@ -89,6 +94,27 @@ async def open_log(callback: types.CallbackQuery, callback_data: dict):
 async def close_log(callback: types.CallbackQuery, callback_data: dict):
     if callback_data['action'] == 'back':
         ans, kb = get_logs_kb(callback.from_user.id)
+        await callback.message.edit_text(text=ans,
+                                         reply_markup=kb)
+    await callback.answer()
+
+
+# Обработчик кнопки "О нас"
+@dp.callback_query_handler(text='about', state=UserStatesGroup.start)
+async def open_about(callback: types.CallbackQuery):
+    await UserStatesGroup.about.set()
+    ans, kb = get_about_kb()
+    await callback.message.edit_text(text=ans,
+                                     reply_markup=kb)
+    await callback.answer()
+
+
+# Обработчик возвращения в главное меню из формы "О нас"
+@dp.callback_query_handler(CallbackData('about', 'action').filter(), state=UserStatesGroup.about)
+async def close_about(callback: types.CallbackQuery, callback_data: dict):
+    if callback_data['action'] == 'back':
+        await UserStatesGroup.start.set()
+        ans, kb = get_start_kb()
         await callback.message.edit_text(text=ans,
                                          reply_markup=kb)
     await callback.answer()

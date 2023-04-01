@@ -19,7 +19,7 @@ async def send_answer(message: types.Message) -> None:
         await message.answer(text=ans1,
                              reply_markup=kb1)
     else:
-        answer = get_answer(get_model_name_kb(message.from_user.id), message.text)
+        answer = get_answer(get_model_name_kb(message.from_user.id), message.text).replace('"', "'")
         if answer != '':
             db.insert_log(user_id=message.from_user.id, model_id=db.get_model_id(user_id=message.from_user.id), question=message.text, answer=answer.lstrip())
             await message.answer(answer)

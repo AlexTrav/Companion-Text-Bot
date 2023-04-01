@@ -74,6 +74,8 @@ def get_logs_kb(user_id):
     else:
         for log in logs[:50]:
             logs_kb.add(InlineKeyboardButton(text=log[3], callback_data=cb.new(id=log[0], action='log')))
+    if len(logs) > 0:
+        logs_kb.add(InlineKeyboardButton(text='Очистить историю запросов', callback_data=cb.new(id=-2, action='clear_history')))
     logs_kb.add(InlineKeyboardButton(text='←', callback_data=cb.new(id=-1, action='back')))
     return answer, logs_kb
 
@@ -88,3 +90,13 @@ def get_log_kb(log_id):
         [InlineKeyboardButton(text='←', callback_data=cb.new(action='back'))]
     ])
     return answer, log_kb
+
+
+# Отправить клавиатуру формы "О нас"
+def get_about_kb():
+    cb = CallbackData('about', 'action')
+    answer = 'Программа выполнена в целях выполнения дипломного проекта.\nСвязь с нами:'
+    about_kb = InlineKeyboardMarkup(row_width=1, inline_keyboard=[
+        [InlineKeyboardButton(text='←', callback_data=cb.new(action='back'))]
+    ])
+    return answer, about_kb
