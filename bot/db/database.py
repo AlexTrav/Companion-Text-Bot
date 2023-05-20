@@ -29,8 +29,7 @@ class DataBase:
             self.cursor.execute(f'SELECT * FROM users WHERE id = {kwargs["user_id"]}')
             user = self.cursor.fetchall()
             if not user:
-                self.cursor.execute(
-                    f'INSERT INTO users(id, username, flname) VALUES ({kwargs["user_id"]}, "{kwargs["username"]}", "{kwargs["flname"]}")')
+                self.cursor.execute(f'INSERT INTO users(id, username, flname) VALUES ({kwargs["user_id"]}, "{kwargs["username"]}", "{kwargs["flname"]}")')
                 self.conn.commit()
 
     # Обновить id модели у user-а
